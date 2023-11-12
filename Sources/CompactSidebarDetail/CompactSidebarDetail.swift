@@ -3,17 +3,17 @@
 
 import SwiftUI
 
-public struct CompactSidebarDetail<P: Hashable, Thumbnail: View, Detail: View>: View {
-    @Binding public var pages: [P]
-    @Binding public var selection: P?
-    @ViewBuilder public var thumbnail: (P) -> Thumbnail
-    @ViewBuilder public var detail: (P) -> Detail
+public struct CompactSidebarDetail<Item: Hashable, Thumbnail: View, Detail: View>: View {
+    public var items: [Item]
+    @Binding public var selection: Item?
+    @ViewBuilder public var thumbnail: (Item) -> Thumbnail
+    @ViewBuilder public var detail: (Item) -> Detail
 
-    public init(_ pages: Binding<[P]>,
-                selection: Binding<P?>,
-                thumbnail: @escaping (P) -> Thumbnail,
-                detail: @escaping (P) -> Detail) {
-        self._pages = pages
+    public init(_ items: [Item],
+                selection: Binding<Item?>,
+                thumbnail: @escaping (Item) -> Thumbnail,
+                detail: @escaping (Item) -> Detail) {
+        self.items = items
         self._selection = selection
         self.thumbnail = thumbnail
         self.detail = detail
@@ -22,13 +22,13 @@ public struct CompactSidebarDetail<P: Hashable, Thumbnail: View, Detail: View>: 
     public var body: some View {
         GeometryReader { geo in
             HStack {
-                PageIndexView(pages: $pages, selection: $selection) {
+                PageIndexView(items: items, selection: $selection) {
                     thumbnail($0)
                 }
                 .frame(width: geo.size.width * 0.3)
                 .background(.thinMaterial)
                 .zIndex(1.0)
-                HorizontalPagingView(pages: $pages, currentPage: $selection) {
+                HorizontalPagingView(items: items, selection: $selection) {
                     detail($0)
                 }
                 .scrollClipDisabled()
@@ -40,23 +40,24 @@ public struct CompactSidebarDetail<P: Hashable, Thumbnail: View, Detail: View>: 
 
 #if DEBUG
 fileprivate struct Preview: View {
-    @State var pages = Array(1..<50)
+    @State var items = Array(1..<50)
     @State var selection: Int?
 
     var body: some View {
-        CompactSidebarDetail($pages, selection: $selection) { n in
+        CompactSidebarDetail(items, selection: $selection) { n in
             RoundedRectangle(cornerRadius: 5)
-                .foregroundStyle(.red)
+                .foregroundColor(.black)
                 .overlay {
                     Text("\(n)")
-                }
-        } detail: { n in
-            RoundedRectangle(cornerRadius: 5)
-                .foregroundStyle(.red)
-                .overlay {
-                    Text("\(n)")
+                        .foregroundStyle(.red)
                 }
                 .padding()
+        } detail: { n in
+            Rectangle()
+                .overlay {
+                    Text("Page \(n)")
+                        .foregroundStyle(.red)
+                }
         }
     }
 }

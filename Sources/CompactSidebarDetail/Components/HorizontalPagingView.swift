@@ -1,31 +1,29 @@
 //
 //  HorizontalPagingView.swift
-//  HorizontalSwipe
+//  CompactSidebarDetail
 //
 //  Created by Kaï-Zen Fœnyx Krysies Berg-Šæmañn on 2023-11-06.
 //
 
 import SwiftUI
 
-struct HorizontalPagingView<P: Hashable, Content: View>: View {
-    @Binding var pages: [P]
-    @Binding var currentPage: P?
-    @ViewBuilder let content: (P) -> Content
+struct HorizontalPagingView<Item: Hashable, Content: View>: View {
+    var items: [Item]
+    @Binding var selection: Item?
+    @ViewBuilder var content: (Item) -> Content
 
     var body: some View {
-        GeometryReader { geo in
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack {
-                    ForEach(pages, id: \.self) {
-                        content($0)
-                    }
-                    .frame(width: geo.size.width)
+        ScrollView(.horizontal) {
+            HStack {
+                ForEach(items, id: \.self) {
+                    content($0)
+                        .containerRelativeFrame(.horizontal)
                 }
-                .scrollTargetLayout()
             }
-            .scrollPosition(id: $currentPage)
-            .scrollTargetBehavior(.viewAligned)
+            .scrollTargetLayout()
         }
+        .scrollPosition(id: $selection)
+        .scrollTargetBehavior(.viewAligned)
     }
 }
 
@@ -35,7 +33,7 @@ fileprivate struct Preview: View {
     @State var currentPage: Int?
 
     var body: some View {
-        HorizontalPagingView(pages: $pages, currentPage: $currentPage) { n in
+        HorizontalPagingView(items: pages, selection: $currentPage) { n in
             RoundedRectangle(cornerRadius: 5)
                 .foregroundStyle(.red)
                 .overlay {

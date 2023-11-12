@@ -7,29 +7,35 @@
 
 import SwiftUI
 
-struct PageIndexView<P: Hashable, Content: View>: View {
-    @Binding var pages: [P]
-    @Binding var selection: P?
-    @ViewBuilder let content: (P) -> Content
+struct PageIndexView<Item: Hashable, Content: View>: View {
+    var items: [Item]
+    @Binding var selection: Item?
+    @ViewBuilder var content: (Item) -> Content
 
     var body: some View {
-        ScrollViewReader { scrollProxy in
-            List(pages, id: \.self, selection: $selection) { page in
-                content(page)
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(page == selection ? Color.accentColor : .clear)
-                    .id(page)
-            }
-            .scrollTargetBehavior(.paging)
-            .scrollContentBackground(.hidden)
-            .onAppear {
-                withAnimation {
-                    scrollProxy.scrollTo(selection, anchor: .center)
+        ZStack {
+            Rectangle()
+                .ignoresSafeArea()
+                .foregroundStyle(.ultraThinMaterial)
+            ScrollViewReader { scrollProxy in
+                ScrollView {
+                    VStack(spacing: 0) {
+                        ForEach(items, id: \.self) { item in
+                            content(item)
+                                .containerRelativeFrame(
+                                    .vertical, count: 5, span: 1, spacing: 0)
+                                .onTapGesture {
+                                    selection = item
+                                }
+                                .animation(.easeInOut, value: selection)
+                                .id(item)
+                        }
+                    }
                 }
-            }
-            .onChange(of: selection) {
-                withAnimation {
-                    scrollProxy.scrollTo(selection, anchor: .center)
+                .onChange(of: selection) {
+                    withAnimation {
+                        scrollProxy.scrollTo(selection, anchor: .center)
+                    }
                 }
             }
         }
@@ -42,7 +48,7 @@ struct PageIndexViewPreview: View {
     @State var selection: Int? = 25
 
     var body: some View {
-        PageIndexView(pages: $pages, selection: $selection) { n in
+        PageIndexView(items: pages, selection: $selection) { n in
             RoundedRectangle(cornerRadius: 5)
                 .foregroundStyle(.red)
                 .overlay {
