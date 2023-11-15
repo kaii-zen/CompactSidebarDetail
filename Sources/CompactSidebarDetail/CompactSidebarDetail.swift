@@ -3,26 +3,33 @@
 
 import SwiftUI
 
-public struct CompactSidebarDetail<Item, Thumbnail, Detail, DetailPlaceholder>: View
-where Item: Hashable, Thumbnail: View, Detail: View,  DetailPlaceholder: View
+public struct CompactSidebarDetail<Item, Thumbnail, Detail, DetailPlaceholder, Backdrop>: View
+where Item: Hashable,
+      Thumbnail: View,
+      Detail: View,
+      DetailPlaceholder: View,
+      Backdrop: View
 {
     public var items: [Item]
     @Binding public var selection: Item?
     public let thumbnail: (Item) -> Thumbnail
     public let detail: (Item) -> Detail
     public let detailPlaceholder: () -> DetailPlaceholder
+    public let backdrop: () -> Backdrop
 
     public init(_ items: [Item],
                 selection: Binding<Item?>,
                 @ViewBuilder thumbnail: @escaping (Item) -> Thumbnail,
                 @ViewBuilder detail: @escaping (Item) -> Detail,
-                @ViewBuilder detailPlaceHolder: @escaping () -> DetailPlaceholder = { EmptyView() }
+                @ViewBuilder detailPlaceholder: @escaping () -> DetailPlaceholder = { EmptyView() },
+                @ViewBuilder backdrop: @escaping () -> Backdrop = { EmptyView() }
     ) {
         self.items = items
         self._selection = selection
         self.thumbnail = thumbnail
         self.detail = detail
-        self.detailPlaceholder = detailPlaceHolder
+        self.detailPlaceholder = detailPlaceholder
+        self.backdrop = backdrop
     }
     
     public var body: some View {
@@ -43,6 +50,9 @@ where Item: Hashable, Thumbnail: View, Detail: View,  DetailPlaceholder: View
                 } else {
                     detailPlaceholder()
                 }
+            }
+            .background {
+                backdrop()
             }
             .animation(.default, value: selection)
         }
@@ -70,6 +80,9 @@ fileprivate struct Preview: View {
                     Text("Page \(n)")
                         .foregroundStyle(.red)
                 }
+        } backdrop: {
+            Color.red
+                .ignoresSafeArea()
         }
     }
 }
