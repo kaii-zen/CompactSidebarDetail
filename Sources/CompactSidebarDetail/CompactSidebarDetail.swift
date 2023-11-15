@@ -40,7 +40,6 @@ where Item: Hashable,
                         thumbnail($0)
                     }
                     .frame(width: geo.size.width * 0.3)
-                    .background(.thinMaterial)
                     .zIndex(1.0)
                     .transition(.move(edge: .leading))
                     HorizontalPagingView(items: items, selection: $selection) {
