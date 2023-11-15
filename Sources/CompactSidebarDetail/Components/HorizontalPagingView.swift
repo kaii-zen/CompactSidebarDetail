@@ -14,10 +14,11 @@ struct HorizontalPagingView<Item: Hashable, Content: View>: View {
 
     var body: some View {
         ScrollView(.horizontal) {
-            HStack {
-                ForEach(items, id: \.self) {
-                    content($0)
+            LazyHStack {
+                ForEach(items, id: \.self) { item in
+                    content(item)
                         .containerRelativeFrame(.horizontal)
+                        .id(item)
                 }
             }
             .scrollTargetLayout()
