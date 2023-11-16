@@ -13,17 +13,14 @@ struct PageIndexView<Item: Hashable, Content: View>: View {
     @ViewBuilder var content: (Item) -> Content
 
     var body: some View {
-        ZStack {
-            Rectangle()
-                .ignoresSafeArea()
-                .foregroundStyle(.ultraThinMaterial)
+        GeometryReader { geo in
             ScrollViewReader { scrollProxy in
                 ScrollView {
                     VStack(spacing: 0) {
                         ForEach(items, id: \.self) { item in
                             content(item)
                                 .containerRelativeFrame(
-                                    .vertical, count: 5, span: 1, spacing: 0)
+                                    .vertical, count: Int(round(geo.size.height / geo.size.width)), span: 1, spacing: 0)
                                 .onTapGesture {
                                     selection = item
                                 }
@@ -31,6 +28,11 @@ struct PageIndexView<Item: Hashable, Content: View>: View {
                                 .id(item)
                         }
                     }
+                }
+                .background {
+                    Rectangle()
+                        .foregroundStyle(.ultraThinMaterial)
+                        .ignoresSafeArea()
                 }
                 .task(id: selection) {
                     do {
