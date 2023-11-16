@@ -52,11 +52,14 @@ fileprivate struct Preview: View {
 
     var body: some View {
         PageIndexView(items: pages, selection: $selection) { n in
-            RoundedRectangle(cornerRadius: 5)
-                .foregroundStyle(.red)
+            let selected = n == selection
+            RoundedRectangle(cornerRadius: 10)
+                .foregroundStyle(selected ? .red : .black)
                 .overlay {
                     Text("\(n)")
+                        .foregroundStyle(selected ? .black : .red)
                 }
+                .padding()
         }
     }
 }
