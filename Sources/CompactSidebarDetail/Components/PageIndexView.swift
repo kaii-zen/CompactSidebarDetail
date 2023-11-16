@@ -43,7 +43,7 @@ struct PageIndexView<Item: Hashable, Content: View>: View {
 }
 
 #if DEBUG
-struct PageIndexViewPreview: View {
+fileprivate struct Preview: View {
     @State var pages = Array(1..<50)
     @State var selection: Int? = 25
 
@@ -59,7 +59,7 @@ struct PageIndexViewPreview: View {
 }
 
 #Preview {
-    PageIndexViewPreview()
+    Preview()
 }
 
 #endif
