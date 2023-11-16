@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PageIndexView<Item: Hashable, Content: View>: View {
-    var items: [Item]
+    @Binding var items: [Item]
     @Binding var selection: Item?
     @ViewBuilder var content: (Item) -> Content
 
@@ -53,7 +53,7 @@ fileprivate struct Preview: View {
     @State var selection: Int? = 25
 
     var body: some View {
-        PageIndexView(items: pages, selection: $selection) { n in
+        PageIndexView(items: $pages, selection: $selection) { n in
             let selected = n == selection
             RoundedRectangle(cornerRadius: 10)
                 .foregroundStyle(selected ? .red : .black)
