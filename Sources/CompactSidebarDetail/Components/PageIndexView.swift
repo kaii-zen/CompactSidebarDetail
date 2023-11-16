@@ -32,7 +32,10 @@ struct PageIndexView<Item: Hashable, Content: View>: View {
                         }
                     }
                 }
-                .onChange(of: selection) {
+                .task(id: selection) {
+                    do {
+                        try await Task.sleep(for: .milliseconds(100))
+                    } catch {}
                     withAnimation {
                         scrollProxy.scrollTo(selection, anchor: .center)
                     }
