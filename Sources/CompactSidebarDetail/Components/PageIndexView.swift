@@ -10,7 +10,7 @@ import SwiftUI
 struct PageIndexView<Item: Hashable, Content: View>: View {
     @Binding var items: [Item]
     @Binding var selection: Item?
-    @ViewBuilder var content: (Item) -> Content
+    @ViewBuilder let content: (Item) -> Content
 
     var body: some View {
         GeometryReader { geo in
