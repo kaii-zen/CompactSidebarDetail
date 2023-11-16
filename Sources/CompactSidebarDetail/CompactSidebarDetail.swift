@@ -79,6 +79,7 @@ fileprivate struct Preview: View {
                     Text("Page \(n)")
                         .foregroundStyle(.red)
                 }
+                .padding()
         } backdrop: {
             Color.red
                 .ignoresSafeArea()
