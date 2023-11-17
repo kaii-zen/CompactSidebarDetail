@@ -17,6 +17,10 @@ where Item: Hashable,
     public let detailPlaceholder: () -> DetailPlaceholder
     public let backdrop: () -> Backdrop
 
+    @State private var sidebarSelection: Item?
+    @State private var sidebarScrollPosition: Item?
+    @State private var detailScrollPosition: Item?
+
     public init(_ items: Binding<[Item]>,
                 selection: Binding<Item?>,
                 @ViewBuilder thumbnail: @escaping (Item) -> Thumbnail,
@@ -36,16 +40,30 @@ where Item: Hashable,
         GeometryReader { geo in
             HStack {
                 if !items.isEmpty {
-                    PageIndexView(items: $items, selection: $selection) {
+                    PageIndexView(items: $items,
+                                  selection: $sidebarSelection,
+                                  scrollPosition: $sidebarScrollPosition) {
                         thumbnail($0)
                     }
                     .frame(width: geo.size.width * 0.3)
                     .zIndex(1.0)
                     .transition(.move(edge: .leading))
-                    HorizontalPagingView(items: items, selection: $selection) {
+                    .task(id: sidebarSelection) {
+                        withAnimation {
+                            sidebarScrollPosition = sidebarSelection
+                            detailScrollPosition = sidebarSelection
+                        }
+                    }
+
+                    HorizontalPagingView(items: items, scrollPosition: $detailScrollPosition) {
                         detail($0)
                     }
                     .scrollClipDisabled()
+                    .task(id: detailScrollPosition) {
+                        withAnimation {
+                            sidebarSelection = detailScrollPosition
+                        }
+                    }
                 } else {
                     detailPlaceholder()
                 }
@@ -53,7 +71,9 @@ where Item: Hashable,
             .background {
                 backdrop()
             }
-            .animation(.default, value: selection)
+            .task(id: sidebarSelection) {
+                selection = sidebarSelection
+            }
         }
     }
 }
