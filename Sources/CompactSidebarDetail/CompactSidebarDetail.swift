@@ -10,7 +10,7 @@ where Item: Hashable,
       DetailPlaceholder: View,
       Backdrop: View
 {
-    @Binding public var items: [Item]
+    public var items: [Item]
     @Binding public var selection: Item?
     public let thumbnail: (Item) -> Thumbnail
     public let detail: (Item) -> Detail
@@ -21,14 +21,14 @@ where Item: Hashable,
     @State private var sidebarScrollPosition: Item?
     @State private var detailScrollPosition: Item?
 
-    public init(_ items: Binding<[Item]>,
+    public init(_ items: [Item],
                 selection: Binding<Item?>,
                 @ViewBuilder thumbnail: @escaping (Item) -> Thumbnail,
                 @ViewBuilder detail: @escaping (Item) -> Detail,
                 @ViewBuilder detailPlaceholder: @escaping () -> DetailPlaceholder = { EmptyView() },
                 @ViewBuilder backdrop: @escaping () -> Backdrop = { EmptyView() }
     ) {
-        self._items = items
+        self.items = items
         self._selection = selection
         self.thumbnail = thumbnail
         self.detail = detail
@@ -40,7 +40,7 @@ where Item: Hashable,
         GeometryReader { geo in
             HStack {
                 if !items.isEmpty {
-                    PageIndexView(items: $items,
+                    PageIndexView(items: items,
                                   selection: $sidebarSelection,
                                   scrollPosition: $sidebarScrollPosition) {
                         thumbnail($0)
@@ -84,7 +84,7 @@ fileprivate struct Preview: View {
     @State var selection: Int?
 
     var body: some View {
-        CompactSidebarDetail($items, selection: $selection) { n in
+        CompactSidebarDetail(items, selection: $selection) { n in
             let selected = n == selection
             RoundedRectangle(cornerRadius: 5)
                 .foregroundColor(selected ? .red : .black)
