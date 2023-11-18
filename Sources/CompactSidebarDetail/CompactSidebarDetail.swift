@@ -17,7 +17,6 @@ where Item: Hashable,
     public let detailPlaceholder: () -> DetailPlaceholder
     public let backdrop: () -> Backdrop
 
-    @State private var sidebarSelection: Item?
     @State private var sidebarScrollPosition: Item?
     @State private var detailScrollPosition: Item?
 
@@ -40,30 +39,18 @@ where Item: Hashable,
         GeometryReader { geo in
             HStack {
                 if !items.isEmpty {
-                    PageIndexView(items: items,
-                                  selection: $sidebarSelection,
-                                  scrollPosition: $sidebarScrollPosition) {
+                    PageIndexView(items: items, selection: $selection, scrollPosition: $sidebarScrollPosition) {
                         thumbnail($0)
                     }
+                    .animation(.default, value: items)
                     .frame(width: geo.size.width * 0.3)
                     .zIndex(1.0)
                     .transition(.move(edge: .leading))
-                    .task(id: sidebarSelection) {
-                        withAnimation {
-                            sidebarScrollPosition = sidebarSelection
-                            detailScrollPosition = sidebarSelection
-                        }
-                    }
 
                     HorizontalPagingView(items: items, scrollPosition: $detailScrollPosition) {
                         detail($0)
                     }
                     .scrollClipDisabled()
-                    .task(id: detailScrollPosition) {
-                        withAnimation {
-                            sidebarSelection = detailScrollPosition
-                        }
-                    }
                 } else {
                     detailPlaceholder()
                 }
@@ -71,8 +58,16 @@ where Item: Hashable,
             .background {
                 backdrop()
             }
-            .task(id: sidebarSelection) {
-                selection = sidebarSelection
+            .task(id: selection) {
+                withAnimation {
+                    sidebarScrollPosition = selection
+                    detailScrollPosition = selection
+                }
+            }
+            .task(id: detailScrollPosition) {
+                withAnimation {
+                    selection = detailScrollPosition
+                }
             }
         }
     }
