@@ -24,7 +24,7 @@ struct PageIndexView<Item: Hashable, Content: View>: View {
                                 selection = item
                             }
                         }
-                        .id(item)
+//                        .id(item)
                 }
             }
             .scrollTargetLayout()

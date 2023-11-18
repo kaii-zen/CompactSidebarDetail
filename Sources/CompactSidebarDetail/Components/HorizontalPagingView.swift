@@ -27,7 +27,6 @@ struct HorizontalPagingView<Item: Hashable, Content: View>: View {
         .scrollPosition(id: $scrollPosition)
         .scrollTargetBehavior(.viewAligned)
         .scrollIndicatorsFlash(trigger: items)
-        .sensoryFeedback(.increase, trigger: scrollPosition)
         .task(id: items.count) {
             if scrollPosition == nil {
                 scrollPosition = items.first
