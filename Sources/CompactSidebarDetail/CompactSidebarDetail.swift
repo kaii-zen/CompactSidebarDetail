@@ -43,12 +43,11 @@ where Item: Hashable,
                     PageIndexView(items: items, selection: $selection, scrollPosition: $sidebarScrollPosition) {
                         thumbnail($0)
                     }
-                    .animation(.default, value: items)
+                    .transition(.move(edge: .leading).combined(with: .opacity))
                     .containerRelativeFrame(.horizontal, { length, _ in
                         length / 3.0
                     })
                     .zIndex(1.0)
-                    .transition(.move(edge: .leading).combined(with: .opacity))
                 }
 
                 HorizontalPagingView(items: items, scrollPosition: $detailScrollPosition) {
@@ -57,6 +56,7 @@ where Item: Hashable,
                 .scrollClipDisabled()
             }
         }
+        .animation(.default, value: items)
         .task(id: selection) {
             withAnimation {
                 sidebarScrollPosition = selection
