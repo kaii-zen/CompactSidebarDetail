@@ -3,71 +3,69 @@
 
 import SwiftUI
 
-public struct CompactSidebarDetail<Item, Thumbnail, Detail, DetailPlaceholder, Backdrop>: View
+public struct CompactSidebarDetail<Item, Thumbnail, Detail, DetailPlaceholder>: View
 where Item: Hashable,
       Thumbnail: View,
       Detail: View,
-      DetailPlaceholder: View,
-      Backdrop: View
+      DetailPlaceholder: View
 {
     public var items: [Item]
     @Binding public var selection: Item?
+    @Binding public var hidingSidebar: Bool
     public let thumbnail: (Item) -> Thumbnail
     public let detail: (Item) -> Detail
     public let detailPlaceholder: () -> DetailPlaceholder
-    public let backdrop: () -> Backdrop
 
     @State private var sidebarScrollPosition: Item?
     @State private var detailScrollPosition: Item?
 
     public init(_ items: [Item],
                 selection: Binding<Item?>,
+                hidingSidebar: Binding<Bool> = .constant(false),
                 @ViewBuilder thumbnail: @escaping (Item) -> Thumbnail,
                 @ViewBuilder detail: @escaping (Item) -> Detail,
-                @ViewBuilder detailPlaceholder: @escaping () -> DetailPlaceholder = { EmptyView() },
-                @ViewBuilder backdrop: @escaping () -> Backdrop = { EmptyView() }
+                @ViewBuilder detailPlaceholder: @escaping () -> DetailPlaceholder = { EmptyView() }
     ) {
         self.items = items
         self._selection = selection
+        self._hidingSidebar = hidingSidebar
         self.thumbnail = thumbnail
         self.detail = detail
         self.detailPlaceholder = detailPlaceholder
-        self.backdrop = backdrop
     }
     
     public var body: some View {
-        GeometryReader { geo in
-            HStack {
-                if !items.isEmpty {
+        HStack {
+            if items.isEmpty {
+                detailPlaceholder()
+            } else {
+                if !hidingSidebar {
                     PageIndexView(items: items, selection: $selection, scrollPosition: $sidebarScrollPosition) {
                         thumbnail($0)
                     }
                     .animation(.default, value: items)
-                    .frame(width: geo.size.width * 0.3)
+                    .containerRelativeFrame(.horizontal, { length, _ in
+                        length / 3.0
+                    })
                     .zIndex(1.0)
-                    .transition(.move(edge: .leading))
+                    .transition(.move(edge: .leading).combined(with: .opacity))
+                }
 
-                    HorizontalPagingView(items: items, scrollPosition: $detailScrollPosition) {
-                        detail($0)
-                    }
-                    .scrollClipDisabled()
-                } else {
-                    detailPlaceholder()
+                HorizontalPagingView(items: items, scrollPosition: $detailScrollPosition) {
+                    detail($0)
                 }
+                .scrollClipDisabled()
             }
-            .background {
-                backdrop()
+        }
+        .task(id: selection) {
+            withAnimation {
+                sidebarScrollPosition = selection
+                detailScrollPosition = selection
             }
-            .task(id: selection) {
-                withAnimation {
-                    sidebarScrollPosition = selection
-                    detailScrollPosition = selection
-                }
-            }
-            .task(id: detailScrollPosition) {
-                withAnimation {
-                    selection = detailScrollPosition
-                }
+        }
+        .task(id: detailScrollPosition) {
+            withAnimation {
+                selection = detailScrollPosition
             }
         }
     }
@@ -77,9 +75,10 @@ where Item: Hashable,
 fileprivate struct Preview: View {
     @State var items = Array(1..<50)
     @State var selection: Int?
+    @State var hidingSidebar = false
 
     var body: some View {
-        CompactSidebarDetail(items, selection: $selection) { n in
+        CompactSidebarDetail(items, selection: $selection, hidingSidebar: $hidingSidebar) { n in
             let selected = n == selection
             RoundedRectangle(cornerRadius: 5)
                 .foregroundColor(selected ? .red : .black)
@@ -91,11 +90,21 @@ fileprivate struct Preview: View {
         } detail: { n in
             Rectangle()
                 .overlay {
-                    Text("Page \(n)")
-                        .foregroundStyle(.red)
+                    VStack {
+                        Text("Page \(n)")
+                        Text("Double tap to hide sidebar")
+                            .font(.caption)
+                    }
+                    .foregroundStyle(.red)
                 }
                 .padding()
-        } backdrop: {
+                .onTapGesture(count: 2) {
+                    withAnimation {
+                        hidingSidebar.toggle()
+                    }
+                }
+        }
+        .background {
             Color.red
                 .ignoresSafeArea()
         }

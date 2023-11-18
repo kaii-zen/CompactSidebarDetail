@@ -34,9 +34,9 @@ struct PageIndexView<Item: Hashable, Content: View>: View {
         .scrollIndicatorsFlash(trigger: items)
         .sensoryFeedback(.increase, trigger: scrollPosition)
         .background {
-                Rectangle()
-                    .foregroundStyle(.ultraThinMaterial)
-                    .ignoresSafeArea()
+            Rectangle()
+                .foregroundStyle(.ultraThinMaterial)
+                .ignoresSafeArea()
         }
     }
 }
