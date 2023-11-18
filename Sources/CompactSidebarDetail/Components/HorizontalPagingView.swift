@@ -53,7 +53,7 @@ fileprivate struct Preview: View {
                     .padding()
             }
             .toolbar {
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                ToolbarItemGroup {
                     Button {
                         withAnimation {
                             pages.append(pages.count + 1)
