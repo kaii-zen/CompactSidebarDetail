@@ -43,7 +43,8 @@ fileprivate struct Preview: View {
 
     var body: some View {
         NavigationStack {
-            HorizontalPagingView(items: pages, scrollPosition: $scrollPosition) { n in
+            HorizontalPagingView(items: pages,
+                                 scrollPosition: $scrollPosition) { n in
                 RoundedRectangle(cornerRadius: 5)
                     .foregroundStyle(.red)
                     .overlay {
