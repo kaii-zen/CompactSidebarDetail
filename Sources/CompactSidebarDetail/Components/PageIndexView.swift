@@ -15,7 +15,7 @@ struct PageIndexView<Item: Hashable, Content: View>: View {
     
     var body: some View {
         ScrollView {
-            VStack {
+            LazyVStack {
                 ForEach(items, id: \.self) { item in
                     content(item)
                         .aspectRatio(1, contentMode: .fill)
@@ -24,7 +24,7 @@ struct PageIndexView<Item: Hashable, Content: View>: View {
                                 selection = item
                             }
                         }
-//                        .id(item)
+                        .id(item)
                 }
             }
             .scrollTargetLayout()
