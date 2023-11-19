@@ -49,17 +49,26 @@ fileprivate struct Preview: View {
     @State var scrollPosition: Int?
 
     var body: some View {
-        PageIndexView(items: pages,
-                      selection: $selection,
-                      scrollPosition: $scrollPosition) { n in
-            let selected = n == selection
-            RoundedRectangle(cornerRadius: 10)
-                .foregroundStyle(selected ? .red : .black)
-                .overlay {
-                    Text("\(n)")
-                        .foregroundStyle(selected ? .black : .red)
+        ZStack {
+            Color.clear
+            HStack {
+                PageIndexView(items: pages,
+                              selection: $selection,
+                              scrollPosition: $scrollPosition) { n in
+                    let selected = n == selection
+                    RoundedRectangle(cornerRadius: 10)
+                        .foregroundStyle(selected ? .red : .black)
+                        .overlay {
+                            Text("\(n)")
+                                .foregroundStyle(selected ? .black : .red)
+                        }
+                        .padding()
                 }
-                .padding()
+                .containerRelativeFrame(.horizontal) { length, _ in
+                    length / 3.0
+                }
+                Spacer()
+            }
         }
     }
 }
