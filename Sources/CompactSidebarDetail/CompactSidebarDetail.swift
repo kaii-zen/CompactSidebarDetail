@@ -3,16 +3,18 @@
 
 import SwiftUI
 
-public struct CompactSidebarDetail<Item, Thumbnail, Detail>: View
+public struct CompactSidebarDetail<Item, Thumbnail, Detail, DetailPlaceholder>: View
 where Item: Hashable,
       Thumbnail: View,
-      Detail: View
+      Detail: View,
+      DetailPlaceholder: View
 {
     public var items: [Item]
     @Binding public var selection: Item?
     @Binding public var hidingSidebar: Bool
     public let thumbnail: (Item) -> Thumbnail
     public let detail: (Item) -> Detail
+    public let detailPlaceholder: () -> DetailPlaceholder
 
     @State private var sidebarScrollPosition: Item?
     @State private var detailScrollPosition: Item?
@@ -21,18 +23,22 @@ where Item: Hashable,
                 selection: Binding<Item?>,
                 hidingSidebar: Binding<Bool> = .constant(false),
                 @ViewBuilder thumbnail: @escaping (Item) -> Thumbnail,
-                @ViewBuilder detail: @escaping (Item) -> Detail
+                @ViewBuilder detail: @escaping (Item) -> Detail,
+                @ViewBuilder detailPlaceholder: @escaping () -> DetailPlaceholder = { EmptyView() }
     ) {
         self.items = items
         self._selection = selection
         self._hidingSidebar = hidingSidebar
         self.thumbnail = thumbnail
         self.detail = detail
+        self.detailPlaceholder = detailPlaceholder
     }
     
     public var body: some View {
         HStack {
-            if !hidingSidebar {
+            if items.isEmpty {
+                detailPlaceholder()
+            } else {
                 PageIndexView(items: items, selection: $selection, scrollPosition: $sidebarScrollPosition) {
                     thumbnail($0)
                 }
