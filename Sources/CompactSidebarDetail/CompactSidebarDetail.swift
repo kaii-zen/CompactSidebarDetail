@@ -58,7 +58,6 @@ where Item: Hashable,
                 }
             }
         }
-        .animation(.default, value: items)
         .task(id: detailScrollPosition) {
             withAnimation {
                 selection = detailScrollPosition
