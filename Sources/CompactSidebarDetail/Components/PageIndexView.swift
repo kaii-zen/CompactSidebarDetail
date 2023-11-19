@@ -33,7 +33,6 @@ struct PageIndexView<Item: Hashable, Content: View>: View {
         .scrollTargetBehavior(.viewAligned)
         .scrollIndicatorsFlash(trigger: items)
         .contentMargins(.horizontal, 5, for: .scrollContent)
-        .sensoryFeedback(.increase, trigger: scrollPosition)
         .background {
             Rectangle()
                 .foregroundStyle(.ultraThinMaterial)
