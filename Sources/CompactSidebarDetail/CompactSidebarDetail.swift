@@ -39,16 +39,15 @@ where Item: Hashable,
             if items.isEmpty {
                 detailPlaceholder()
             } else {
-                if !hidingSidebar {
-                    PageIndexView(items: items, selection: $selection, scrollPosition: $sidebarScrollPosition) {
-                        thumbnail($0)
-                    }
-                    .transition(.move(edge: .leading).combined(with: .opacity))
-                    .containerRelativeFrame(.horizontal, { length, _ in
-                        length / 3.0
-                    })
-                    .zIndex(1.0)
+                PageIndexView(items: items, selection: $selection, scrollPosition: $sidebarScrollPosition) {
+                    thumbnail($0)
                 }
+                .transition(.move(edge: .leading).combined(with: .opacity))
+                .opacity(hidingSidebar ? 0 : 1)
+                .containerRelativeFrame(.horizontal, { length, _ in
+                    hidingSidebar ? 0 : length / 3.0
+                })
+                .zIndex(1.0)
 
                 HorizontalPagingView(items: items, scrollPosition: $detailScrollPosition) {
                     detail($0)
