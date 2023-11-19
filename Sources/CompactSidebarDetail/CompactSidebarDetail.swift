@@ -41,20 +41,24 @@ where Item: Hashable,
                 })
                 .transition(.move(edge: .leading).combined(with: .opacity))
                 .zIndex(1.0)
-
-                HorizontalPagingView(items: items, scrollPosition: $detailScrollPosition) {
-                    detail($0)
+                .task(id: selection) {
+                    withAnimation {
+                        sidebarScrollPosition = selection
+                    }
                 }
-                .scrollClipDisabled()
+            }
+
+            HorizontalPagingView(items: items, scrollPosition: $detailScrollPosition) {
+                detail($0)
+            }
+            .scrollClipDisabled()
+            .task(id: selection) {
+                withAnimation {
+                    detailScrollPosition = selection
+                }
             }
         }
         .animation(.default, value: items)
-        .task(id: selection) {
-            withAnimation {
-                sidebarScrollPosition = selection
-                detailScrollPosition = selection
-            }
-        }
         .task(id: detailScrollPosition) {
             withAnimation {
                 selection = detailScrollPosition
